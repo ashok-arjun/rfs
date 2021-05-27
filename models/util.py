@@ -13,7 +13,7 @@ def create_model(name, n_cls, dataset='miniImageNet'):
             print('use imagenet-style resnet50')
             model = model_dict[name](num_classes=n_cls)
         elif name.startswith('resnet') or name.startswith('seresnet'):
-            model = model_dict[name](avg_pool=True, drop_rate=0.1, dropblock_size=5, num_classes=n_cls)
+            model = model_dict[name](avg_pool=False, drop_rate=0, dropblock_size=0, num_classes=n_cls)
         elif name.startswith('wrn'):
             model = model_dict[name](num_classes=n_cls)
         elif name.startswith('convnet'):
