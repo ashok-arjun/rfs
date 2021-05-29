@@ -119,3 +119,5 @@ venv.bak/
 .mypy_cache/
 *.tar.gz
 miniImageNet/
+jupyterlab_tensorboard/
+package-lock.json

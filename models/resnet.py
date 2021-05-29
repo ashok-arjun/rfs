@@ -211,6 +211,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, is_feat=False):
+        print('Forward pass')
         x = self.layer1(x)
         f0 = x
         x = self.layer2(x)
@@ -224,8 +225,6 @@ class ResNet(nn.Module):
         x = x.view(x.size(0), -1)
         feat = x
         if self.num_classes > 0:
-            print('X: ', x.shape)
-            print('self.classifier: ', self.classifier.weight.data.shape)
             x = self.classifier(x)
 
         if is_feat:
