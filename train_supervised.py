@@ -5,6 +5,9 @@ import argparse
 import socket
 import time
 import sys
+import random
+
+import numpy as np
 
 import tensorboard_logger as tb_logger
 import torch
@@ -74,6 +77,7 @@ def parse_option():
                         help='The number of augmented samples for each meta test sample')
     parser.add_argument('--test_batch_size', type=int, default=1, metavar='test_batch_size',
                         help='Size of test batch)')
+    parser.add_argument('--seed', type=int, default=2021, help='Seed')
 
     parser.add_argument('-t', '--trial', type=str, default='1', help='the experiment id')
 
@@ -128,6 +132,14 @@ def parse_option():
 def main():
 
     opt = parse_option()
+    
+    SEED = opt.seed
+    torch.manual_seed(SEED)
+    torch.cuda.manual_seed(SEED)
+    np.random.seed(SEED)
+    random.seed(SEED)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
 
     # dataloader
     train_partition = 'trainval' if opt.use_trainval else 'train'

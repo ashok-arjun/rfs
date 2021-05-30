@@ -85,14 +85,23 @@ class ResNet12(nn.Module):
         self.inplanes = planes
         return block
 
-    def forward(self, x):
+    def forward(self, x, is_feat=False):
         x = self.layer1(x)
+        f0 = x
         x = self.layer2(x)
+        f1 = x
         x = self.layer3(x)
+        f2 = x
         x = self.layer4(x)
-        x = x.view(x.shape[0], x.shape[1], -1).mean(dim=2)
+        f3 = x
+        x = x.view(x.shape[0], x.shape[1], -1).mean(dim=2) # same as avgpool2d(1)
+        f4 = x
         x = self.classifier(x)
-        return x
+        f5 = x
+        if is_feat:
+            return [f0, f1, f2, f3, f4], f5
+        else:
+            return f5
 
 
 def resnet12(**kwargs):

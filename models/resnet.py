@@ -105,7 +105,7 @@ class BasicBlock(nn.Module):
         self.num_batches_tracked = 0
         self.drop_block = drop_block
         self.block_size = block_size
-#         self.DropBlock = DropBlock(block_size=self.block_size)
+        self.DropBlock = DropBlock(block_size=self.block_size)
         self.use_se = use_se
         if self.use_se:
             self.se = SELayer(planes, 4)
@@ -133,6 +133,7 @@ class BasicBlock(nn.Module):
         out += residual
         out = self.relu(out)
         out = self.maxpool(out)
+
         if self.drop_rate > 0:
             if self.drop_block == True:
                 feat_size = out.size()[2]
@@ -149,27 +150,24 @@ class ResNet(nn.Module):
 
     def __init__(self, block, n_blocks, keep_prob=1.0, avg_pool=False, drop_rate=0.0,
                  dropblock_size=5, num_classes=-1, use_se=False):
-        
         super(ResNet, self).__init__()
 
-        print("Instantiating resnet")
-        
         self.inplanes = 3
         self.use_se = use_se
         self.layer1 = self._make_layer(block, n_blocks[0], 64,
                                        stride=2, drop_rate=drop_rate)
-        self.layer2 = self._make_layer(block, n_blocks[1], 128,
+        self.layer2 = self._make_layer(block, n_blocks[1], 160,
                                        stride=2, drop_rate=drop_rate)
-        self.layer3 = self._make_layer(block, n_blocks[2], 256,
-                                       stride=2, drop_rate=drop_rate, drop_block=False, block_size=dropblock_size)
-        self.layer4 = self._make_layer(block, n_blocks[3], 512,
-                                       stride=2, drop_rate=drop_rate, drop_block=False, block_size=dropblock_size)
+        self.layer3 = self._make_layer(block, n_blocks[2], 320,
+                                       stride=2, drop_rate=drop_rate, drop_block=True, block_size=dropblock_size)
+        self.layer4 = self._make_layer(block, n_blocks[3], 640,
+                                       stride=2, drop_rate=drop_rate, drop_block=True, block_size=dropblock_size)
         if avg_pool:
             # self.avgpool = nn.AvgPool2d(5, stride=1)
             self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.keep_prob = keep_prob
         self.keep_avg_pool = avg_pool
-#         self.dropout = nn.Dropout(p=1 - self.keep_prob, inplace=False)
+        self.dropout = nn.Dropout(p=1 - self.keep_prob, inplace=False)
         self.drop_rate = drop_rate
         
         for m in self.modules():
@@ -181,7 +179,7 @@ class ResNet(nn.Module):
 
         self.num_classes = num_classes
         if self.num_classes > 0:
-            self.classifier = nn.Linear(512, self.num_classes)
+            self.classifier = nn.Linear(640, self.num_classes)
 
     def _make_layer(self, block, n_block, planes, stride=1, drop_rate=0.0, drop_block=False, block_size=1):
         downsample = None
@@ -211,7 +209,6 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, is_feat=False):
-        print('Forward pass')
         x = self.layer1(x)
         f0 = x
         x = self.layer2(x)
@@ -236,7 +233,6 @@ class ResNet(nn.Module):
 def resnet12(keep_prob=1.0, avg_pool=False, **kwargs):
     """Constructs a ResNet-12 model.
     """
-    print("ResNet12")
     model = ResNet(BasicBlock, [1, 1, 1, 1], keep_prob=keep_prob, avg_pool=avg_pool, **kwargs)
     return model
 
@@ -290,9 +286,9 @@ def seresnet24(keep_prob=1.0, avg_pool=False, **kwargs):
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], keep_prob=keep_prob, avg_pool=avg_pool, use_se=True, **kwargs)
     return model
+
+
 def seresnet50(keep_prob=1.0, avg_pool=False, **kwargs):
-
-
     """Constructs a ResNet-50 model.
     indeed, only (3 + 4 + 6 + 3) * 3 + 1 = 49 layers
     """

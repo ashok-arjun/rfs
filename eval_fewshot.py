@@ -83,7 +83,7 @@ def main():
     # test loader
     args = opt
     args.batch_size = args.test_batch_size
-    # args.n_aug_support_samples = 1
+    args.n_aug_support_samples = 1
 
     if opt.dataset == 'miniImageNet':
         train_trans, test_trans = transforms_options[opt.transform]
@@ -157,18 +157,18 @@ def main():
         cudnn.benchmark = True
 
     # evalation
-    start = time.time()
-    val_acc, val_std = meta_test(model, meta_valloader)
-    val_time = time.time() - start
-    print('val_acc: {:.4f}, val_std: {:.4f}, time: {:.1f}'.format(val_acc, val_std,
-                                                                  val_time))
+#     start = time.time()
+#     val_acc, val_std = meta_test(model, meta_valloader)
+#     val_time = time.time() - start
+#     print('val_acc: {:.4f}, val_std: {:.4f}, time: {:.1f}'.format(val_acc, val_std,
+#                                                                   val_time))
 
-    start = time.time()
-    val_acc_feat, val_std_feat = meta_test(model, meta_valloader, use_logit=False)
-    val_time = time.time() - start
-    print('val_acc_feat: {:.4f}, val_std: {:.4f}, time: {:.1f}'.format(val_acc_feat,
-                                                                       val_std_feat,
-                                                                       val_time))
+#     start = time.time()
+#     val_acc_feat, val_std_feat = meta_test(model, meta_valloader, use_logit=False)
+#     val_time = time.time() - start
+#     print('val_acc_feat: {:.4f}, val_std: {:.4f}, time: {:.1f}'.format(val_acc_feat,
+#                                                                        val_std_feat,
+#                                                                        val_time))
 
     start = time.time()
     test_acc, test_std = meta_test(model, meta_testloader)
